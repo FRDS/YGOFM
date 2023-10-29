@@ -1,0 +1,40 @@
+{
+    "compiler": {
+        "function_sections": 1,
+        "reorder_functions": 1,
+        "optimization": 4,
+        "debug": 1,
+        "psyq": 0,
+        "8mb": 0,
+        "pch": "common.h"
+    },
+    "versions": [
+        {
+            "japan": {
+                "name": "fm-jp.bin",
+                "symbols": [
+                    "syms_jp.txt"
+                ],
+                "build_id": 1209
+            }
+        },
+        {
+            "usa": {
+                "name": "fm-usa.bin",
+                "symbols": [
+                    "syms_usa.txt"
+                ],
+                "build_id": "usa"
+            }
+        },
+        {
+            "pal": {
+                "name": "fm-pal.bin",
+                "symbols": [
+                    "syms_pal.txt"
+                ],
+                "build_id": 1122
+            }
+        }
+    ]
+}

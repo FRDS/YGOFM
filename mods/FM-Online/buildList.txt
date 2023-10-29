@@ -1,0 +1,2 @@
+// version, section, address, offset, path, binary name [optional]
+usa, exe, 0x800100cc, 0x0, src/fmonline_main.c
