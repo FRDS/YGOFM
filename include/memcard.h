@@ -58,7 +58,7 @@ struct MemCard
         // Offset: 0x5E0 (1504)
         int numStarchips;
 
-        char unkPlayerFill_A1C[0xA1C];
+        char unkPlayerFill_9C[0x9c];
 
         // MemcardProfile[0] - main profile to be first loaded
         // MemcardProfile[1] - Backup duplicate (same data) in case first profile is deemed 'Illegal'
