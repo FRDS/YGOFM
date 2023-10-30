@@ -1,2 +1,12 @@
-// version, section, address, offset, path, binary name [optional]
 usa, exe, 0x800100cc, 0x0, src/fmonline_main.c
+
+// Patch Duplicate Duelist Code
+usa, exe, 0x8003FAE8, 0x0, src/duelistCode.s
+
+// Patch Maximum LP
+usa, exe, 0x800251A4, 0x0, ../../nop.s
+
+// Remove Trap Rotation
+usa, exe, 0x8001CA24, 0x0, ../../nop.s
+usa, exe, 0x8001CA2C, 0x0, ../../nop.s
+usa, exe, 0x8001CA30, 0x0, ../../nop.s
