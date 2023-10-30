@@ -1,6 +1,5 @@
-sdata = 0x80010000;
 main = 0x80012B50;
 equipResult = 0x80019A08;
-DUEL_End = 0x800218f0;
+End_Duel = 0x800218f0;
 Duelist_DuplicateCheck = 0x8003D288;
 sdata_static = 0x8009AF08;
