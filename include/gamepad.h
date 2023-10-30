@@ -1,0 +1,16 @@
+enum Buttons {
+    BUTTON_L2 = 1,
+    BUTTON_R2 = 2,
+    BUTTON_L1 = 4,
+    BUTTON_R1 = 8,
+    BUTTON_TRIANGLE = 0x10,
+    BUTTON_CIRCLE = 0x20,
+    BUTTON_X = 0x40,
+    BUTTON_SQUARE = 0x80,
+    BUTTON_SELECT = 0x100,
+    BUTTON_START = 0x800,
+    D_PAD_UP = 0x1000,
+    D_PAD_RIGHT = 0x2000,
+    D_PAD_DOWN = 0x4000,
+    D_PAD_LEFT = 0x8000
+};

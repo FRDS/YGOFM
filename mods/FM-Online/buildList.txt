@@ -1,12 +1,13 @@
-usa, exe, 0x800100cc, 0x0, src/fmonline_main.c
+319, exe, 0x801CD5A0, 0x0, src/fmonline_main.c
+319, exe, 0x800742e0, 0x0, src/hookVsync.s
 
 // Patch Duplicate Duelist Code
-usa, exe, 0x8003FAE8, 0x0, src/duelistCode.s
+319, exe, duelistCode, 0x0, src/duelistCode.s
 
 // Patch Maximum LP
-usa, exe, 0x800251A4, 0x0, ../../nop.s
+319, exe, maxLifePoint, 0x0, ../../nop.s
 
 // Remove Trap Rotation
-usa, exe, 0x8001CA24, 0x0, ../../nop.s
-usa, exe, 0x8001CA2C, 0x0, ../../nop.s
-usa, exe, 0x8001CA30, 0x0, ../../nop.s
+319, exe, trapRot0, 0x0, output/nops.bin
+319, exe, trapRot1, 0x0, output/nops.bin
+319, exe, trapRot2, 0x0, output/nops.bin

@@ -6,7 +6,8 @@
 #include <text.h>
 #include <memcard.h>
 
-enum CardType {
+enum CardType
+{
     DRAGON = 0x00,
     SPELLCASTER = 0x01,
     ZOMBIE = 0x02,
@@ -33,7 +34,8 @@ enum CardType {
     EQUIP = 0x17
 };
 
-enum TerrainID {
+enum TerrainID
+{
     NORMAL = 0x00,
     FOREST = 0x01,
     WASTELAND = 0x02,
@@ -43,7 +45,8 @@ enum TerrainID {
     DARK = 0x06
 };
 
-enum MenuID {
+enum MenuID
+{
     NEW_GAME = 0x00,
     LOAD = 0x01,
     DUEL_2P_MENU = 0x02,
@@ -60,7 +63,8 @@ enum MenuID {
 
 // Start at:
 // USA - 8009AF08
-struct sData {
+struct global_pointer
+{
 
     char unkFillstart[717];
 
@@ -76,12 +80,13 @@ struct sData {
 
     char unkFill86[86];
 
-    struct {
+    struct
+    {
 
         // Address: 8009B2C4
         // Description: Debug Menu - last Sound ID played
         int lastSoundID;
-        
+
         // Address: 8009B2C8
         // Description: Debug Menu - Scene ID or Sound ID
         int sceneOrSoundID;
@@ -110,13 +115,37 @@ struct sData {
     // Description: Terrain type
     char terrainType;
 
-    char unkFill4EC9D[0x4EC9D]; // Filler
+    char unkfill2B[0x2B];
+
+    // Address: 8009B390
+    // Description: Where Player Inputs are Processed.
+    struct
+    {
+
+        // Buffer for player inputs, 2 bytes per each player (P1 & P2)
+        // See values in gamepad.h
+
+        // Offset: 0x0
+        u_short ButtonHeld[2];
+        // Offset: 0x4
+        u_short ButtonUpdateCurrFrame[2];
+        // Offset: 0x8
+        u_short ButtonTapped[2];
+
+        int unk_gamepad[2]; // unknown Data
+        // Offset: 0x14
+        u_short ButtonHeldBackup[2]
+
+    } GamePad;
+
+    char unkFill4EC5A[0x4EC5A]; // Filler
 
     // Address: 800EA002 (assumption)
     // 2 structs for 2 duelists
     // 0: 1P
     // 1: 2P/COM
-    struct {
+    struct
+    {
 
         // Offset: 0x0
         // Description: Life Points (display)
@@ -146,7 +175,7 @@ struct sData {
     char unkFill145DE[0x145DE]; // Filler
 
     // Address: 800FE6F8
-    // Description: PRNG seed 
+    // Description: PRNG seed
     // (gets seeded at KONAMI screen, starts rolling at opening cutscene before title screen)
     int prngSeed;
 
@@ -212,7 +241,7 @@ struct sData {
     // Description: Fusion table
     // not 65536 or it'll overflows into Menu ID.
     // 33468 is just the assumed size, before where menu ID is.
-    char fusionTable[33468]; 
+    char fusionTable[33468];
 
     // Address: 80184594
     // Description: Main Menu ID
@@ -221,18 +250,38 @@ struct sData {
     char unkFill2388B[0x2388B]; // Filler
 
     // Address: 801A7E20
-    // Description: Player's Hand
-    char playerHand[30];
+    // Description: Current Card data on Players' Hand
+    struct
+    {
+
+        // Offset: 0x0;
+        // First two bytes is card ID;
+        short cardId;
+        // Offset: 0x2 and 0x4;
+        short unkCardData[2];
+
+        // 6 bytes per card, for a total of 5 cards.
+
+    } PlayerHand[5];
 
     char unkFill1CA[0x1CA]; // Filler
 
     // Address: 801A8008
-    // Description: Card passwords and costs
-    char cardPasswordsAndCosts[5776];
+    // Description: Password and Cost data for each of the 722 cards.
+    struct
+    {
+        // Offset: 0x0
+        int cost;
+        // Offset: 0x4
+        int password;
+
+        // 8 bytes total for each card.
+
+    } cardPasswordsAndCosts[722];
 
     char unkFill26B68[0x26B68]; // Filler
 
-    /* 
+    /*
     Address: 801D0200
     Description: Where Player Data is Loaded
 
@@ -241,55 +290,55 @@ struct sData {
     2 - 2P (Duel 2P)
     ... There could be more for other purposes
     */
-    struct 
+    struct
     {
-    // Offset: 0x0
-    // Description: Player's deck
-    short playerDeck[40];
+        // Offset: 0x0
+        // Description: Player's deck
+        short playerDeck[40];
 
-    // Offset: 0x50 (80)
-    // Description: Number of each of 722 Card in chest
-    // Max per card 255 (0xFF).
-    char cardsInChest[722];
+        // Offset: 0x50 (80)
+        // Description: Number of each of 722 Card in chest
+        // Max per card 255 (0xFF).
+        char cardsInChest[722];
 
-    char unkPlayerFill_12[0x12];
+        char unkPlayerFill_12[0x12];
 
-    // Offset: 0x334 (820)
-    // Description: Duelist Code
-    int duelistCode;
+        // Offset: 0x334 (820)
+        // Description: Duelist Code
+        int duelistCode;
 
-    char blankPlayerFill[8]; // Blank Filler
+        char blankPlayerFill[8]; // Blank Filler
 
-    // Offset: 0x340 (832)
-    // Description: Unknown Player Data
-    char unkPlayerData[64];
+        // Offset: 0x340 (832)
+        // Description: Unknown Player Data
+        char unkPlayerData[64];
 
-    char unkPlayerFill_174[0x174]; // Filler
+        char unkPlayerFill_174[0x174]; // Filler
 
-    // Offset: 0x4F4 (1268)
-    // Description: Duelists unlocked in Free Duel
-    // -1 (0xFFFFFFFF to unlock all)
-    int freeDuelUnlocks;
+        // Offset: 0x4F4 (1268)
+        // Description: Duelists unlocked in Free Duel
+        // -1 (0xFFFFFFFF to unlock all)
+        int freeDuelUnlocks;
 
-    char unkPlayerFill_C4[0xC4]; // Filler
+        char unkPlayerFill_C4[0xC4]; // Filler
 
-    // Offset: 0x5BC (1468)
-    // Description: Last 10 cards dropped
-    short last10CardsDrop[10];
+        // Offset: 0x5BC (1468)
+        // Description: Last 10 cards dropped
+        short last10CardsDrop[10];
 
-    char unkPlayerFill_16[16]; // Filler
+        char unkPlayerFill_16[16]; // Filler
 
-    // Offset: 0x5E0 (1504)
-    // Description: Starchip count
-    int numStarchips;
+        // Offset: 0x5E0 (1504)
+        // Description: Starchip count
+        int numStarchips;
 
-    char unkPlayerFill_A1C[0xA1C];
+        char unkPlayerFill_A1C[0xA1C];
 
-    // size per Player Profile is approximately 0x1000 (4096) bytes;
+        // size per Player Profile is approximately 0x1000 (4096) bytes;
 
     } PlayerProfile[3];
 
-    char unkFill2408[0x2408];
+    char unkFill24A8[0x24A8];
 
     // Address: 801D5608
     // int unk1d5608;
@@ -299,9 +348,9 @@ struct sData {
     short cardDropID2;
 };
 
-extern struct sData sdata_static;
+extern struct global_pointer gp_static;
 
 // optimal use for modding
-register struct sData* sdata asm("$gp");
+register struct global_pointer *gp asm("$gp");
 
 #endif
