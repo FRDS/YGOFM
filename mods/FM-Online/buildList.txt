@@ -1,5 +1,5 @@
 319, exe, 0x801CD5A0, 0x0, src/fmonline_main.c
-319, exe, 0x800742e0, 0x0, src/hookVsync.s
+319, exe, 0x80012D7C, 0x0, src/hookRoutine.s
 
 // Patch Duplicate Duelist Code
 319, exe, duelistCode, 0x0, src/duelistCode.s

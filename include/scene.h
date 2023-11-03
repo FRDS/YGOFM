@@ -173,5 +173,5 @@ FFF  CARDS USED      REMAINING LP */
 enum Scene
 {
     DUEL_SETUP = 0x2D0,
-    DUEL_2P = 0x2D3
+    DUEL_2P = 0x2C3
 };

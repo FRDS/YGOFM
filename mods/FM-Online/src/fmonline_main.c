@@ -1,14 +1,14 @@
 #include <common.h>
 
-/* ASM Locations */
-extern u_int *playerBeginMatch;
-extern u_int *triangleText;
-extern u_int *triangleImage;
-extern u_int *playGsSound;
-extern u_int *drawGsCursor[3] = {0x800370EC, 0x800371D0, 0x8003725C};
-extern u_int *drawGsSymbols;
-extern u_int *drawGsText;
-extern u_char *lpDigits[2] = {0x80016F98, 0x80016F14};
+extern u_int triangleText;
+extern u_int triangleImage;
+extern u_int playGsSound;
+extern u_int drawGsSymbols;
+extern u_int drawGsText;
+extern u_int drawGsCursor0;
+extern u_int drawGsCursor1;
+extern u_int drawGsCursor2;
+extern u_char lpDigits0, lpDigits1, playerBeginMatch;
 
 /* ASM Instructions */
 int triangleTextInst = 0x93860343;
@@ -17,31 +17,21 @@ int playSoundInst = 0x0C00FFB8;
 int drawGsCursorInst[3] = {0x0C00DBE0, 0x0C01001B, 0x0C00DBE0};
 int drawTextInst = 0x0C00DB05;
 
-char i, duelEnded, playing, changeTurn, switchedSides = 0;
+char duelEnded, playing, switchedSides = 0;
+char this_player = -1;
 char p1Begin = 1;
 
 void ChangeCardView(char player)
 {
-	gp->DuelScreen[player].viewCard = 0;
-	gp->DuelScreen[player + 1 % 2].viewCard = -1;
-}
-
-void AdjustLPString()
-{
-	for (i = 0; i < 2; i++)
-	{
-		if (gp->DuelScreen[i].LPActual > 9999)
-			*lpDigits[i] = 5;
-		else
-			*lpDigits[i] = 4;
-	}
+	gp->DuelStats[player * 2].viewCard = 0;
+	gp->DuelStats[((!player) ? 2 : 0)].viewCard = -1;
 }
 
 void AdvanceSeed()
 {
 	int seed = gp->prngSeed;
 
-	for (i = 0; i < 255; i++)
+	for (short i = 0; i < 255; i++)
 		seed = (seed * 0x41C64E6D) + 0x3039; // LCG using FM's params
 
 	gp->prngSeed = seed;
@@ -49,28 +39,14 @@ void AdvanceSeed()
 
 void SwitchSides()
 {
-	if (gp->currentScene == DUEL_SETUP)
+	if (gp->currentScene == DUEL_SETUP && !switchedSides)
 	{
-		if (!switchedSides)
-		{
-			switchedSides = 1;
-			duelEnded = 0;
-			AdvanceSeed();
-			if (p1Begin)
-			{
-				*playerBeginMatch = 0x90;
-				p1Begin = 0;
-			}
-			else
-			{
-				*playerBeginMatch = 0x80;
-				p1Begin = 1;
-			}
-		}
-	}
-	else
-	{
-		switchedSides = 0;
+		switchedSides = 1;
+		duelEnded = 0;
+		AdvanceSeed();
+		// switch to P2 and back after every match
+		playerBeginMatch = (p1Begin) ? 0x90 : 0x80;
+		p1Begin = !p1Begin;
 	}
 }
 
@@ -78,23 +54,25 @@ void UpdateImgAndText(char player)
 {
 	if (player == gp->currentTurn)
 	{
-		*playGsSound = playSoundInst;
-		for (i = 0; i < 3; ++i)
-			*drawGsCursor[i] = drawGsCursorInst[i];
-		*drawGsSymbols = drawTextInst;
-		*drawGsText = drawTextInst;
-		*triangleImage = triangleImageInst;
-		*triangleText = triangleTextInst;
+		playGsSound = playSoundInst;
+		drawGsCursor0 = drawGsCursorInst[0];
+		drawGsCursor1 = drawGsCursorInst[1];
+		drawGsCursor2 = drawGsCursorInst[2];
+		drawGsSymbols = drawTextInst;
+		drawGsText = drawTextInst;
+		triangleImage = triangleImageInst;
+		triangleText = triangleTextInst;
 	}
 	else
 	{
-		*playGsSound = 0;
-		for (i = 0; i < 3; ++i)
-			*drawGsCursor[i] = 0;
-		*drawGsSymbols = 0;
-		*drawGsText = 0;
-		*triangleImage = 0;
-		*triangleText = 0;
+		playGsSound = 0;
+		drawGsCursor0 = 0;
+		drawGsCursor1 = 0;
+		drawGsCursor2 = 0;
+		drawGsSymbols = 0;
+		drawGsText = 0;
+		triangleImage = 0;
+		triangleText = 0;
 	}
 }
 
@@ -106,26 +84,29 @@ void HandleGame(char player)
 	}
 	else
 	{
+		char currentTurn = gp->currentTurn;
 		if (gp->currentScene == DUEL_2P)
 		{
-			short lp[2] = {gp->DuelScreen[0].LPActual, gp->DuelScreen[1].LPActual};
-			ChangeCardView(player);
-
+			short lp[2] = {gp->DuelStats[0].LPActual, gp->DuelStats[2].LPActual};
 			if (!playing)
 			{
-				while (!lp[0] && !lp[0])
-					ChangeCardView(player);
+				if (!lp[0] && !lp[1]) // if still loading don't change view yet
+					return;
+				ChangeCardView(player);
 				playing = 1;
-				UpdateImgAndText(player);
+				switchedSides = 0;
 			}
+			else
+			{
+				// LP Num digits based on value
+				lpDigits0 = (lp[0] > 9999) ? 5 : 4;
+				lpDigits1 = (lp[1] > 9999) ? 5 : 4;
 
-			AdjustLPString();
-
-			if (gp->currentTurn != player)
 				UpdateImgAndText(player);
 
-			if (!lp[0] && !lp[0])
-				UpdateImgAndText(gp->currentTurn);
+				if (!lp[0] && !lp[1])
+					UpdateImgAndText(currentTurn);
+			}
 		}
 		else
 		{
@@ -133,7 +114,7 @@ void HandleGame(char player)
 			{
 				duelEnded = 1;
 				playing = 0;
-				UpdateImgAndText(gp->currentTurn);
+				UpdateImgAndText(currentTurn);
 			}
 		}
 	}
@@ -144,26 +125,19 @@ char DeterminePlayer()
 {
 	short pad1 = gp->GamePad.ButtonHeld[0];
 	short pad2 = gp->GamePad.ButtonHeld[1];
-	if ((pad1 > 0) && (!pad2))
-		return 1;
-	else if ((!pad1) && (pad2 > 0))
-		return 2;
-	else
-		return 0;
+	return (pad1 > 0 && !pad2) ? 0 : ((!pad1 && pad2 > 0) ? 1 : -1);
 }
 
 // Hook into a function that runs every frame, Vsync()?
 void fmOnline_main()
 {
-	char player;
-	short scene;
+	short scene = gp->currentScene;
 
-	if (scene = gp->currentScene,
-		scene != DUEL_SETUP && scene != DUEL_2P)
+	if (scene != DUEL_SETUP && scene != DUEL_2P)
 		return;
 
-	if (!player)
-		player = DeterminePlayer();
+	if (this_player < 0)
+		this_player = DeterminePlayer();
 	else
-		HandleGame(player - 1);
+		HandleGame(this_player);
 }

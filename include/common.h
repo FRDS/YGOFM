@@ -65,8 +65,13 @@ enum MenuID
 // USA - 8009AF08
 struct global_pointer
 {
+    char unkFillstart[714];
 
-    char unkFillstart[717];
+    // Address: 8009B1D2
+    // Description: Last Activated Magic Card ID
+    short lastMagicID;
+
+    char unkChar;
 
     // Address: 8009B1D5
     // Description: Duel Screen - Current Turn
@@ -97,7 +102,7 @@ struct global_pointer
 
     // Address: 8009B338
     // Description: Selected card ID
-    short selectedCardID;
+    short selectedID;
 
     char unkFill27[0x27]; // Filler
 
@@ -133,40 +138,62 @@ struct global_pointer
         u_short ButtonTapped[2];
 
         int unk_gamepad[2]; // unknown Data
+        
         // Offset: 0x14
-        u_short ButtonHeldBackup[2]
+        u_short ButtonHeldBackup[2];
 
     } GamePad;
 
-    char unkFill4EC5A[0x4EC5A]; // Filler
+    char unkFill4EC58[0x4EC58]; // Filler
 
-    // Address: 800EA002 (assumption)
-    // 2 structs for 2 duelists
-    // 0: 1P
-    // 1: 2P/COM
+    // Address: 800EA000
+    // 3 structs for 3 types of duelists
+    // 0: 1P (Player 1)
+    // 1: COM Opponent
+    // 2: 2P (Player 2)
     struct
     {
-
         // Offset: 0x0
+        // Description: Average Defense Stat of All Monsters in deck.
+        short dfd_factor;
+
+        // Offset: 0x2
         // Description: Life Points (display)
         short LPDisplay;
 
-        // offset: 0x2
+        // Offset: 0x4
         // Description: Life Points (actual)
         short LPActual;
 
-        char unkDuel9[9];
+        // Offset: 0x6
+        // Description: Max Life Points
+        short LPCap;
 
-        // offset: 0xD (13)
-        // -1 - Cards are blocked
-        // 0 - Cards are drawn
+        // Offset: 0x8
+        // Description: Number of Cards Used.
+        char cardsUsed;
+
+        // Offset: 0x9
+        // Description: Remaining Swords of Revealing Light Turns
+        char remaining_SoRLt;
+
+        // Offset: 0xA
+        // 1 byte per card on hand (5 in total, left to right)
+        // Description: Deck Number for this Card on hand
+        char deckNumber[5];
+
+        // Offset: 0xF (15)
+        // Description: Flag for hide/show the cards on your hand.
+        // -1: Hide cards
+        // 0: Draw card
+        // 1: Only draw card number
         char viewCard;
 
-        char unkDuel18[18];
+        // Size is 0x10 (16) bytes per player, 0x30 (48) bytes in total
 
-    } DuelScreen[2];
+    } DuelStats[3];
 
-    char unkFillD6[0xD6];
+    char unkFillE8[0xe8];
 
     // Address: 800EA118
     // Description: Result of a fusion
